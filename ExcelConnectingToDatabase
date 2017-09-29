@@ -1,0 +1,55 @@
+'https://www.youtube.com/watch?v=HE9CIbetNnI&index=34&list=PLNIs-AWhQzckr8Dgmgb3akx_gFMnpxTN5
+'Using Late Binding so we can use as it is 
+Option Explicit
+Const strSqlConnectionString as String
+Const strSqlConnectionString as String
+
+strSqlConnectionString="Provider :......... Set the connection"
+Sub CopyDataFromDatabase()
+
+    Dim objConnection as Object
+    Dim objData as Object
+    Dim objField as Object
+    
+    Set objConnection= CreateObject("ADODB.Connection")
+    Set objConnection= CreateObject("ADODB.Recordset")
+    
+    objConnection.ConnectionString = strSqlConnectionString
+    objConnection.Open()
+    
+    On Error GoTo closeConnection
+    With objData
+      .ActiveConnection = objConnection
+      .Source = "tblActor" ' or we can write a query in it select * from table
+      .LockType = 1
+      .CursorType = 0
+      .Open
+    End With
+    
+    On Error GoTo closeRecordSet
+    'Pasting in to the Range of Cells
+    WorkSheet.Add
+    
+    
+    For Each objField in objData.Fields
+      ActiveCell.Value = objField.Name
+      ActiveCell.Offset(0,1).Select
+    Next objField
+    
+    Range("A1").Select
+    Range("A2").CopyFromRecordSet objData
+    Range("A1").CurrentRegion.EntireColumn.AutoFit
+
+closeRecordSet:
+    objData.Close
+
+    'Or Accesing Field by field
+    
+    Range("A1").Select
+    objConnection.Close
+    
+    On Error GoTo 0
+closeConnection:
+    objConnection.Close
+
+End sub
